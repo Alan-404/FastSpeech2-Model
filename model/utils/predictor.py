@@ -17,7 +17,7 @@ class VariancePredictor(nn.Module):
 
         self.to(device)
 
-    def forward(self, x: Tensor, mask: Tensor):
+    def forward(self, x: Tensor, mask: Tensor = None):
         """ 
             x: (batch_size, length, d_model) 
         """

@@ -40,37 +40,36 @@ def get_mask_from_lengths(lengths, max_len=None):
 # %%
 from model.utils.mask import generate_padding_mask, generate_look_ahead_mask
 # %%
-a = torch.tensor([[1,2,3], [2,3,4], [2,0 ,0]])
+def get_mask_from_lengths(lengths, max_len=None):
+    batch_size = lengths.shape[0]
+    if max_len is None:
+        max_len = torch.max(lengths).item()
+
+    ids = torch.arange(0, max_len).unsqueeze(0).expand(batch_size, -1).to(device)
+    mask = ids >= lengths.unsqueeze(1).expand(-1, max_len)
+
+    return mask
+
 # %%
 device = torch.device('cuda')
 # %%
+a = torch.tensor([1,2,3])
+#%%
 a = a.to(device)
 # %%
-a
+b = get_mask_from_lengths(a, 10)
 # %%
-padding = generate_padding_mask(a)
+b
 # %%
-look = generate_look_ahead_mask(a)
+b.size()
 # %%
-look
+c = torch.tensor([[1,0,0,0,0,0,0,0,0,0], [1,2,0,0,0,0,0,0,0,0], [1,2,3,0,0,0,0,0,0,0]])
+# %%
+c.size()
+# %%
+padding = (c==0)
 # %%
 padding
-# %%
-padding.shape
-# %%
-look.shape
-# %%
-a  =get_mask_from_lengths(a)
-# %%
-
-# %%
-length = LengthRegulator()
-
-
-# %%
-result = length(a, 10, 3)
-# %%
-
 # %%
 
 # %%

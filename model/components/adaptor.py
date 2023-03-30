@@ -55,7 +55,7 @@ class VarianceAdaptor(nn.Module):
         self.to(device)
 
     def get_pitch_embedding(self, x, target, mask, control):
-        prediction = self.pitch_predictor(x, mask)
+        prediction = self.pitch_predictor(x, None)
         if target is not None:
             embedding = self.pitch_embedding(torch.bucketize(target, self.pitch_bins))
         else:
@@ -66,7 +66,7 @@ class VarianceAdaptor(nn.Module):
         return prediction, embedding
 
     def get_energy_embedding(self, x, target, mask, control):
-        prediction = self.energy_predictor(x, mask)
+        prediction = self.energy_predictor(x, None)
         if target is not None:
             embedding = self.energy_embedding(torch.bucketize(target, self.energy_bins))
         else:
@@ -90,15 +90,26 @@ class VarianceAdaptor(nn.Module):
         d_control=1.0,
     ):
 
-        log_duration_prediction = self.duration_predictor(x, src_mask)
+        log_duration_prediction = self.duration_predictor(x, None)
         if self.pitch_feature_level == "phoneme_level":
             pitch_prediction, pitch_embedding = self.get_pitch_embedding(
                 x, pitch_target, src_mask, p_control
             )
             x = x + pitch_embedding
+        elif self.pitch_feature_level == "frame_level":
+            pitch_prediction, pitch_embedding = self.get_pitch_embedding(
+                x, pitch_target, mel_mask, p_control
+            )
+            x = x + pitch_embedding
+        
         if self.energy_feature_level == "phoneme_level":
             energy_prediction, energy_embedding = self.get_energy_embedding(
                 x, energy_target, src_mask, e_control
+            )
+            x = x + energy_embedding
+        elif self.energy_feature_level == "frame_level":
+            energy_prediction, energy_embedding = self.get_energy_embedding(
+                x, energy_target, mel_mask, p_control
             )
             x = x + energy_embedding
 
@@ -113,16 +124,6 @@ class VarianceAdaptor(nn.Module):
             x, mel_len = self.length_regulator(x, duration_rounded, max_len)
             mel_mask = get_mask_from_lengths(mel_len)
 
-        if self.pitch_feature_level == "frame_level":
-            pitch_prediction, pitch_embedding = self.get_pitch_embedding(
-                x, pitch_target, mel_mask, p_control
-            )
-            x = x + pitch_embedding
-        if self.energy_feature_level == "frame_level":
-            energy_prediction, energy_embedding = self.get_energy_embedding(
-                x, energy_target, mel_mask, p_control
-            )
-            x = x + energy_embedding
 
         return (
             x,
