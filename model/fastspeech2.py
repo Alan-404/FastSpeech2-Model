@@ -9,9 +9,6 @@ from model.components.decoder import Decoder
 
 from typing import Callable
 
-from model.utils.mask import generate_padding_mask
-
-
 class FastSpeech2Model(nn.Module):
     def __init__(self, 
                 phoneme_size: int, 
