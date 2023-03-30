@@ -8,8 +8,6 @@ from .ffn import PositionWiseFeedForward
 from typing import Callable
 
 
-
-
 class FFT(nn.Module):
     def __init__(self, d_model: int, heads: int, hidden_dim: int, dropout_rate: float, eps: float, activation: Callable[[Tensor], Tensor]) -> None:
         super().__init__()
@@ -28,7 +26,6 @@ class FFT(nn.Module):
         sub_layer_1 = self.residual_connection_1(attention_output, x)
 
         residual = sub_layer_1
-
         sub_layer_1 = torch.transpose(sub_layer_1, -1, -2)
         ffn_output = self.ffn(sub_layer_1)
         ffn_output = torch.transpose(ffn_output, -1, -2)

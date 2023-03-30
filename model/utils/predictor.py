@@ -17,7 +17,7 @@ class VariancePredictor(nn.Module):
 
         self.to(device)
 
-    def forward(self, x: Tensor):
+    def forward(self, x: Tensor, mask: Tensor):
         """ 
             x: (batch_size, length, d_model) 
         """
@@ -38,6 +38,8 @@ class VariancePredictor(nn.Module):
         x = self.dropout_layer_2(x) # (batch_size, length, hidden_dim)
 
         x = self.linear(x)
-
+        x = x.squeeze(-1)
+        if mask is not None:
+            x = x.masked_fill(mask==1, 0.0)
         return x
 

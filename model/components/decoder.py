@@ -18,5 +18,5 @@ class Decoder(nn.Module):
         for layer in self.layers:
             x = layer(x, mask)
         x = self.linear(x)
-        x = self.post_net(x)
+        x = x + self.post_net(x)
         return x

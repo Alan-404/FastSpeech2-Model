@@ -17,7 +17,6 @@ class PositionWiseFeedForward(nn.Module):
         self.to(device)
 
     def forward(self, x: Tensor):
-        print(x.size())
         x = self.conv1d_1(x)
         x = self.activation(x)
         x = self.conv1d_2(x)
