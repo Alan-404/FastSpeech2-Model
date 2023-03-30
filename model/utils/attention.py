@@ -24,7 +24,7 @@ class MultiHeadAttention(nn.Module):
     def scaled_dot_product_attention(self, q: Tensor, k: Tensor, v: Tensor, mask: Tensor):
         dk = torch.tensor(k.size(-1)).type(torch.float32)
 
-        attention_scores = torch.matmul(q, k)
+        attention_scores = torch.matmul(q, k.transpose(-1, -2))
         attention_scores = attention_scores/torch.sqrt(dk)
 
         if mask is not None:

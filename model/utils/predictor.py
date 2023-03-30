@@ -2,7 +2,7 @@ import torch
 from torch import Tensor
 import torch.nn as nn
 import torch.nn.functional as F
-
+device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
 class VariancePredictor(nn.Module):
     def __init__(self, d_model: int, hidden_dim: int, dropout_rate: float, eps: float) -> None:
         super().__init__()
@@ -14,6 +14,8 @@ class VariancePredictor(nn.Module):
         self.layer_norm_2 = nn.LayerNorm(normalized_shape=hidden_dim, eps=eps)
         self.dropout_layer_1 = nn.Dropout(p=dropout_rate)
         self.dropout_layer_2 = nn.Dropout(p=dropout_rate)
+
+        self.to(device)
 
     def forward(self, x: Tensor):
         """ 

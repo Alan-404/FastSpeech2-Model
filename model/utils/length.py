@@ -3,9 +3,12 @@ import torch.nn as nn
 from torch import Tensor
 import torch.nn.functional as F
 
+device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
+
 class LengthRegulator(nn.Module):
     def __init__(self) -> None:
         super().__init__()
+        self.to(device)
 
     def LR(self, x: Tensor, duration: int, max_len: int):
         output = list()

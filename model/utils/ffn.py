@@ -4,6 +4,8 @@ import torch.nn as nn
 
 from typing import Callable
 
+device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
+
 class PositionWiseFeedForward(nn.Module):
     def __init__(self, channels: int, hidden_channels: int, activation: Callable[[Tensor], Tensor]) -> None:
         super().__init__()
@@ -12,7 +14,10 @@ class PositionWiseFeedForward(nn.Module):
 
         self.activation = activation
 
+        self.to(device)
+
     def forward(self, x: Tensor):
+        print(x.size())
         x = self.conv1d_1(x)
         x = self.activation(x)
         x = self.conv1d_2(x)

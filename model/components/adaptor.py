@@ -7,13 +7,16 @@ import numpy as np
 
 from model.utils.mask import get_mask_from_lengths
 
+device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
+
+
 class VarianceAdaptor(nn.Module):
-    def __init__(self, d_model: int, hidden_dim: int, n_bins: int, pitch_feature_level: str, energy_feature_level: str, pitch_quantization: str, energy_quantization, dropout_rate: float, eps: float) -> None:
+    def __init__(self, d_model: int, hidden_dim: int, n_bins: int, pitch_feature_level: str, energy_feature_level: str, pitch_quantization: str, energy_quantization: str, dropout_rate: float, eps: float) -> None:
         super().__init__()
         self.duration_predictor = VariancePredictor(d_model=d_model, hidden_dim=hidden_dim, dropout_rate=dropout_rate, eps=eps)
         self.length_regulator = LengthRegulator()
-        self.pitch_predictor = VarianceAdaptor(d_model=d_model, hidden_dim=hidden_dim, dropout_rate=dropout_rate, eps=eps)
-        self.energy_predictor = VarianceAdaptor(d_model=d_model, hidden_dim=hidden_dim, dropout_rate=dropout_rate, eps=eps)
+        self.pitch_predictor = VariancePredictor(d_model=d_model, hidden_dim=hidden_dim, dropout_rate=dropout_rate, eps=eps)
+        self.energy_predictor = VariancePredictor(d_model=d_model, hidden_dim=hidden_dim, dropout_rate=dropout_rate, eps=eps)
         
         pitch = [-2.917079304729967, 11.391254536985784, 207.6309860026605, 46.77559025098988]
         energy = [-1.431044578552246, 8.184337615966797, 37.32621679053821, 26.044180782835863]
@@ -48,6 +51,8 @@ class VarianceAdaptor(nn.Module):
         
         self.pitch_embedding = nn.Embedding(num_embeddings=n_bins, embedding_dim=d_model)
         self.energy_embedding = nn.Embedding(num_embeddings=n_bins, embedding_dim=d_model)
+
+        self.to(device)
 
     def get_pitch_embedding(self, x, target, mask, control):
         prediction = self.pitch_predictor(x, mask)

@@ -28,10 +28,11 @@ class FFT(nn.Module):
         sub_layer_1 = self.residual_connection_1(attention_output, x)
 
         residual = sub_layer_1
-        attention_output = torch.reshape(attention_output, (-1, -2))
-        ffn_output = self.ffn(x)
+
+        sub_layer_1 = torch.transpose(sub_layer_1, -1, -2)
+        ffn_output = self.ffn(sub_layer_1)
+        ffn_output = torch.transpose(ffn_output, -1, -2)
         sub_layer_2 = self.residual_connection_2(ffn_output, residual)
-        sub_layer_2 = torch.reshape(sub_layer_2, (-1, -2))
 
         return sub_layer_2
 
